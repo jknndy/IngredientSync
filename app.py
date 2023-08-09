@@ -1,6 +1,14 @@
 from flask import Flask, request, jsonify, render_template
 from recipe_scrapers import scrape_me
 
+def safe_scrape(callable_func, default_value):
+    try:
+        return callable_func()
+    except Exception as e:
+        if "No ratings data in SchemaOrg." in str(e):
+            return default_value
+        raise e
+
 app = Flask(__name__)
 
 @app.route('/', methods=['GET', 'POST'])
@@ -12,22 +20,22 @@ def index():
             scraper = scrape_me(url, wild_mode=True)
             result = {
                 'success': True,
-                'title': scraper.title() or "N/A",
-                'host': scraper.host() or "N/A",
-                'total_time': scraper.total_time() or "N/A",
-                'image': scraper.image() or "N/A",
-                'ingredients': scraper.ingredients() or [],
-                'instructions': scraper.instructions() or "N/A",
-                'instructions_list': scraper.instructions_list() or [],
-                'yields': scraper.yields() or "N/A",
-                'nutrients': scraper.nutrients() or {},
-                'category': scraper.category() or "N/A",
-                'cuisine': scraper.cuisine() or "N/A",
-                'ratings': scraper.ratings() or {},
-                'description': scraper.description() or "N/A",
-                'author': scraper.author() or "N/A"
+                'title': safe_scrape(scraper.title, "N/A"),
+                'host': safe_scrape(scraper.host, "N/A"),
+                'total_time': safe_scrape(scraper.total_time, "N/A"),
+                'image': safe_scrape(scraper.image, "N/A"),
+                'ingredients': safe_scrape(scraper.ingredients, []),
+                'instructions': safe_scrape(scraper.instructions, "N/A"),
+                'instructions_list': safe_scrape(scraper.instructions_list, []),
+                'yields': safe_scrape(scraper.yields, "N/A"),
+                'nutrients': safe_scrape(scraper.nutrients, {}),
+                'category': safe_scrape(scraper.category, "N/A"),
+                'cuisine': safe_scrape(scraper.cuisine, "N/A"),
+                'ratings': safe_scrape(scraper.ratings, {}),
+                'description': safe_scrape(scraper.description, "N/A"),
+                'author': safe_scrape(scraper.author, "N/A"),
             }
-        except Exception as e:  # It's better to catch specific exceptions, but this is a general catch for simplicity.
+        except Exception as e:
             result = {'success': False, 'error_message': str(e)}
     else:
         result = {'success': False, 'error_message': 'Please provide a valid URL.'}
