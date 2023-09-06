@@ -1,34 +1,17 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Scraper</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingredient Sync</title>
 </head>
 <body>
-    <form id="scrapeForm">
-        <label for="url">Enter URL:</label><br>
-        <input type="text" id="url" name="url"><br>
+    <h1>Welcome to Ingredient Sync</h1>
+    <form method="POST">
+        <label for="url">Enter URLs (separated by a comma):</label><br>
+        <textarea id="url" name="url" rows="4" cols="50"></textarea><br>
         <input type="submit" value="Submit">
     </form>
-    <br>
-    <textarea id="output" rows="4" cols="50"></textarea>
-    <button onclick="myFunction()">Copy text</button>
-
-    <script>
-        function myFunction() {
-            var copyText = document.getElementById("output");
-            copyText.select();
-            document.execCommand("copy");
-        }
-
-        $("#scrapeForm").submit(function(event) {
-            event.preventDefault();
-            var url = $("#url").val();
-
-            $.post("/", { url: url }, function(data) {
-                $("#output").val(JSON.stringify(data));
-            });
-        });
-    </script>
+    <div id="results"></div>
 </body>
 </html>
